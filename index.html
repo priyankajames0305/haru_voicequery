@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice Support — Haru Tech</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Background Orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Chrome Warning Banner (hidden by default, shown by JS if needed) -->
+  <div class="chrome-banner hidden" id="chromeBanner">
+    ⚠ Please open this page in <strong>Google Chrome</strong> for voice recording to work.
+  </div>
+
+  <!-- App Shell -->
+  <div class="app-shell">
+
+    <!-- Logo Bar -->
+    <header class="logo-bar">
+      <div class="logo">
+        <span class="logo-icon">◎</span>
+        <span class="logo-text">Haru<strong>Tech</strong></span>
+      </div>
+      <div class="step-dots" id="stepDots">
+        <span class="dot active" data-step="1"></span>
+        <span class="dot" data-step="2"></span>
+        <span class="dot" data-step="3"></span>
+      </div>
+    </header>
+
+    <!-- ══════════════════════════════════
+         SCREEN 1 — RECORD
+    ══════════════════════════════════ -->
+    <section class="screen active" id="screenRecord">
+      <div class="screen-inner">
+        <div class="screen-label">STEP 01 / 03</div>
+        <h1 class="screen-title">Speak your<br /><em>query</em></h1>
+        <p class="screen-sub" id="recordSub">
+          Tap the mic, speak your issue in <strong>any language</strong>, then tap again to stop.
+        </p>
+
+        <!-- Language Selector -->
+        <div class="lang-select-wrap">
+          <label>Select Language</label>
+          <div class="custom-select" id="langSelectTrigger" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+            <span id="langSelectLabel">Auto-detect</span>
+            <svg class="custom-select-arrow" viewBox="0 0 12 8" aria-hidden="true">
+              <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="custom-select-menu hidden" id="langSelectMenu" role="listbox" aria-label="Select language"></div>
+          <select id="langSelect" class="hidden" aria-hidden="true">
+            <option value="">Auto-detect</option>
+            <option value="ta-IN">Tamil (India)</option>
+            <option value="ta">Tamil</option>
+            <option value="en-IN">English (India)</option>
+            <option value="en">English</option>
+            <option value="hi-IN">Hindi</option>
+            <option value="te-IN">Telugu</option>
+            <option value="ml-IN">Malayalam</option>
+            <option value="kn-IN">Kannada</option>
+            <option value="mr-IN">Marathi</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="zh-CN">Chinese (Simplified)</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+          </select>
+        </div>
+
+        <!-- Mic Stage -->
+        <div class="mic-stage">
+          <div class="ripple-ring ring-3"></div>
+          <div class="ripple-ring ring-2"></div>
+          <div class="ripple-ring ring-1"></div>
+          <button class="mic-btn" id="micBtn" aria-label="Start recording">
+            <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+            <svg class="stop-icon hidden" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="6" width="12" height="12" rx="2"/>
+            </svg>
+          </button>
+          <div class="mic-hint">Tap once to start, tap again to stop.</div>
+        </div>
+
+        <!-- Timer -->
+        <div class="timer-block" id="timerBlock">
+          <span class="timer-label" id="timerLabel">00:00</span>
+          <div class="timer-bar-wrap">
+            <div class="timer-bar" id="timerBar"></div>
+          </div>
+          <span class="timer-max">60s max</span>
+        </div>
+
+        <!-- Status -->
+        <div class="status-chip" id="statusChip">
+          <span class="chip-dot"></span>
+          <span id="statusText">Ready to record</span>
+        </div>
+
+        <!-- Proceed button (appears after recording stops) -->
+        <button class="primary-btn hidden" id="btnReview" onclick="goToReview()">
+          Review &amp; Send <span class="btn-arrow">→</span>
+        </button>
+
+        <!-- Help text -->
+        <p class="help-note">
+          🔒 Uses Chrome's built-in speech recognition — your voice is processed securely by Google.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+         SCREEN 2 — REVIEW
+    ══════════════════════════════════ -->
+    <section class="screen" id="screenReview">
+      <div class="screen-inner">
+        <div class="screen-label">STEP 02 / 03</div>
+        <h1 class="screen-title">Review &amp;<br /><em>confirm</em></h1>
+        <p class="screen-sub">Check your query below. You can edit it if needed, then add your phone number.</p>
+
+        <!-- Original Language Query Card -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-tag">Your Query (Original Language)</span>
+            <button class="edit-hint" title="Click textarea to edit">✎ edit</button>
+          </div>
+          <textarea class="query-textarea" id="queryTextareaOriginal" rows="4"
+            placeholder="Your original language text will appear here…"></textarea>
+        </div>
+
+        <!-- English Translation Card -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-tag">English Translation</span>
+            <button class="edit-hint" title="Click textarea to edit">✎ edit</button>
+          </div>
+          <div class="processing-overlay" id="processingOverlay">
+            <div class="spinner"></div>
+            <span>Translating to English…</span>
+          </div>
+          <textarea class="query-textarea" id="queryTextarea" rows="4"
+            placeholder="English translation will appear here…"></textarea>
+        </div>
+
+        <!-- Phone Card -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-tag">Your Mobile Number</span>
+          </div>
+          <div class="phone-row">
+            <div class="country-select-wrap">
+              <select class="country-select" id="countryCode">
+                <option value="+91">🇮🇳 +91</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+61">🇦🇺 +61</option>
+                <option value="+971">🇦🇪 +971</option>
+                <option value="+65">🇸🇬 +65</option>
+                <option value="+60">🇲🇾 +60</option>
+                <option value="+49">🇩🇪 +49</option>
+                <option value="+33">🇫🇷 +33</option>
+                <option value="+81">🇯🇵 +81</option>
+                <option value="+86">🇨🇳 +86</option>
+                <option value="+55">🇧🇷 +55</option>
+                <option value="+27">🇿🇦 +27</option>
+                <option value="+234">🇳🇬 +234</option>
+                <option value="+7">🇷🇺 +7</option>
+              </select>
+            </div>
+            <input class="phone-input" id="phoneInput" type="tel"
+              placeholder="98765 43210" maxlength="15" inputmode="numeric" />
+          </div>
+          <div class="phone-error hidden" id="phoneError">⚠ Please enter a valid phone number (7–15 digits)</div>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-row">
+          <button class="ghost-btn" onclick="goBack()">← Back</button>
+          <button class="primary-btn" id="btnSend" disabled onclick="sendQuery()">
+            Send Query <span class="btn-arrow">→</span>
+          </button>
+        </div>
+
+        <!-- Sending Overlay -->
+        <div class="sending-overlay hidden" id="sendingOverlay">
+          <div class="spinner large"></div>
+          <span>Sending your query…</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+         SCREEN 3 — SUCCESS
+    ══════════════════════════════════ -->
+    <section class="screen" id="screenSuccess">
+      <div class="screen-inner center">
+        <div class="success-anim">
+          <div class="success-ring"></div>
+          <div class="success-check">✓</div>
+        </div>
+        <div class="screen-label">DONE!</div>
+        <h1 class="screen-title">Thank you for your query.</h1>
+        <p class="screen-sub success-msg">
+          It has been submitted successfully.
+        </p>
+        <div class="success-copy">
+          <p>Our support team is reviewing your request now.</p>
+          <p>Feel free to submit another query if you need anything else.</p>
+        </div>
+        <button class="primary-btn" onclick="resetApp()">Submit Another Query</button>
+      </div>
+    </section>
+
+  </div><!-- /app-shell -->
+
+  <script src="index.js"></script>
+</body>
+</html>
